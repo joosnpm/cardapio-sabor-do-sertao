@@ -32,7 +32,6 @@
   <!-- Cabeçalho e Introdução -->
   <header class="text-center py-12 px-2.5 flex flex-col items-center">
     
-    <!-- Link da Logo Corrigido para o formato thumbnail -->
     <img src="https://drive.google.com/thumbnail?id=1JkrMgfvCnyON8ACJR3-Dx4XJyTGm_hrk&sz=w1000" alt="Logo Sabor do Sertão" class="w-full max-w-xs md:max-w-sm mb-4">
     
     <p class="text-xl mt-2 text-amber-800 px-2.5">O autêntico Bolo de Tapioca cremoso, com o gostinho especial que não adianta ver. Você só vai entender depois de experimentar, então não perde tempo pois as fatias são limitadas.</p>
@@ -43,7 +42,6 @@
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
       <div class="grid grid-cols-1 md:grid-cols-2 items-center">
         
-        <!-- Link da Imagem de Apresentação Corrigido para o formato thumbnail -->
         <div class="h-80 md:h-full">
           <img src="https://drive.google.com/thumbnail?id=13C2M621a1X_JUJKgSG5-K6M3mgjmno1t&sz=w1000" alt="Detalhe do Bolo de Tapioca Cremoso" class="w-full h-full object-cover">
         </div>
@@ -80,7 +78,6 @@
         
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition-all">
           
-          <!-- Link da Imagem da Fatia Corrigido para o formato thumbnail -->
           <img src="https://drive.google.com/thumbnail?id=1Z6WU8zgupMukcOIjS3PbfOzV9nSytkcr&sz=w1000" alt="Fatia do Bolo de Tapioca" class="w-full h-48 object-cover">
           
           <div class="p-4">
@@ -96,7 +93,6 @@
 
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition-all">
           
-          <!-- CORREÇÃO APLICADA AQUI -->
           <img src="https://drive.google.com/thumbnail?id=1czASbu3RHnkIg2887cF4npMETeTFqRvZ&sz=w1000" alt="Bolo de Tapioca Inteiro" class="w-full h-48 object-cover">
 
           <div class="p-4">
@@ -147,8 +143,8 @@
           <div>
             <h3 class="text-xl font-bold text-amber-900 mb-2">Opções de Entrega</h3>
             <div class="space-y-2">
-              <label class="flex items-center"><input type="radio" name="entrega" value="Retirar no Local (área de convivência das 19h às 22h)" checked onchange="atualizarCarrinho()" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500"> <span class="ml-2">Retirar no Local (área de convivência das 19h às 22h)</span></label>
-              <label class="flex items-center"><input type="radio" name="entrega" value="UAST (das 19h às 22h)" onchange="atualizarCarrinho()" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500"> <span class="ml-2">Entregar na UAST (das 19h às 22h) (Taxa: R$ 1,00)</span></label>
+              <label class="flex items-center"><input type="radio" name="entrega" value="Retirar no Local" checked onchange="atualizarCarrinho()" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500"> <span class="ml-2 text-sm sm:text-base">Retirar no Local</span></label>
+              <label class="flex items-center"><input type="radio" name="entrega" value="Entregar na UAST" onchange="atualizarCarrinho()" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500"> <span class="ml-2 text-sm sm:text-base">Entregar na UAST (Taxa: R$ 1,00)</span></label>
               <p class="text-xs text-amber-700 ml-6">Grátis a partir de 2 fatias!</p>
             </div>
           </div>
@@ -171,6 +167,12 @@
       
       <textarea id="obs" class="w-full mt-4 p-3 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="Observações do pedido (opcional)"></textarea>
       
+      <!-- Mensagem de Confirmação da Data/Hora -->
+      <div class="mt-6 p-4 bg-amber-100 border-l-4 border-amber-500 text-amber-800 rounded-r-lg">
+        <p class="font-bold">Atenção!</p>
+        <p class="text-sm">As retiradas e entregas ocorrerão no dia **17/06**, das **19h às 22h**, durante a Maratona Gastronômica.</p>
+      </div>
+      
       <button id="finalizar" onclick="finalizarPedido()" class="w-full mt-6 bg-green-600 text-white font-bold py-3 px-6 text-lg rounded-lg hover:bg-green-700 transition-all shadow-lg transform hover:scale-105">
         Finalizar Pedido no WhatsApp
       </button>
@@ -182,14 +184,12 @@
     const carrinho = [];
     const numeroWhatsApp = "5587996612962"; // Coloque aqui o número de WhatsApp que receberá os pedidos
 
-    // Função para adicionar um item ao carrinho
     function adicionarItem(nome, preco, inputId) {
       const quantidadeInput = document.getElementById(inputId);
       const qtd = parseInt(quantidadeInput.value);
 
-      if (isNaN(qtd) || qtd < 1) {
-        return;
-      }
+      if (isNaN(qtd) || qtd < 1) { return; }
+      
       const itemExistente = carrinho.find(item => item.nome === nome);
       if (itemExistente) {
         itemExistente.qtd += qtd;
@@ -200,7 +200,6 @@
       atualizarCarrinho();
     }
 
-    // Função para remover um item do carrinho
     function removerItem(index) {
       if (carrinho[index].qtd > 1) {
           carrinho[index].qtd--;
@@ -210,7 +209,6 @@
       atualizarCarrinho();
     }
 
-    // Função para atualizar a exibição do carrinho
     function atualizarCarrinho() {
       const listaCarrinho = document.getElementById("lista-carrinho");
       const totalElement = document.getElementById("total");
@@ -238,15 +236,15 @@
         listaCarrinho.appendChild(li);
       });
 
-      // Lógica da taxa de entrega
       const formaEntrega = document.querySelector('input[name="entrega"]:checked').value;
       let taxaEntrega = 0;
       let totalFinal = subtotal;
       let htmlTotal = `<div>Subtotal: R$ ${subtotal.toFixed(2)}</div>`;
       
-      if (formaEntrega === "UAST (das 19h às 22h)") {
+      if (formaEntrega === "Entregar na UAST") {
           const qtdFatias = carrinho.find(item => item.nome === 'Fatia do Bolo')?.qtd || 0;
-          if (qtdFatias < 2) {
+          const qtdBolos = carrinho.find(item => item.nome === 'Bolo Inteiro')?.qtd || 0;
+          if (qtdFatias < 2 && qtdBolos === 0) {
               taxaEntrega = 1.00;
               totalFinal += taxaEntrega;
               htmlTotal += `<div>Taxa de Entrega: R$ ${taxaEntrega.toFixed(2)}</div>`;
@@ -258,7 +256,6 @@
       totalElement.innerHTML = htmlTotal;
     }
 
-    // Função para finalizar o pedido e enviar via WhatsApp
     function finalizarPedido() {
       if (carrinho.length === 0) {
         alert("Seu carrinho está vazio! Adicione um item para continuar.");
@@ -284,8 +281,7 @@
         return;
       }
 
-      // Montagem da mensagem para o WhatsApp sem emojis
-      let mensagem = `Olá, *Ana*!\nGostaria de fazer o seguinte pedido:\n\n`;
+      let mensagem = `Olá, *Sabor do Sertão*!\nGostaria de fazer o seguinte pedido:\n\n`;
       
       carrinho.forEach(item => {
         mensagem += `• _${item.qtd}x_ *${item.nome}* - R$ ${(item.preco * item.qtd).toFixed(2)}\n`;
@@ -295,16 +291,17 @@
       let taxaEntrega = 0;
       let totalFinal = subtotal;
 
-      if (formaEntrega === "UAST (das 19h às 22h)") {
+      if (formaEntrega === "Entregar na UAST") {
           const qtdFatias = carrinho.find(item => item.nome === 'Fatia do Bolo')?.qtd || 0;
-          if (qtdFatias < 2) {
+          const qtdBolos = carrinho.find(item => item.nome === 'Bolo Inteiro')?.qtd || 0;
+          if (qtdFatias < 2 && qtdBolos === 0) {
               taxaEntrega = 1.00;
               totalFinal += taxaEntrega;
           }
       }
       
       mensagem += `\n*Subtotal:* R$ ${subtotal.toFixed(2)}`;
-      if (formaEntrega === "UAST (das 19h às 22h)") {
+      if (formaEntrega === "Entregar na UAST") {
         mensagem += `\n*Taxa de Entrega:* ${taxaEntrega > 0 ? `R$ ${taxaEntrega.toFixed(2)}` : 'Grátis!'}`;
       }
       mensagem += `\n\n*Total do Pedido:* R$ ${totalFinal.toFixed(2)}`;
@@ -330,12 +327,20 @@
       if (obs) {
         mensagem += `\n\n_Observações:_\n${obs}`;
       }
+      
+      mensagem += `\n\n--- _Retirada/Entrega_ ---\n`;
+      mensagem += `*Data:* 17/06\n`;
+      mensagem += `*Horário:* Das 19h às 22h`;
 
       const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
       window.open(url, "_blank");
     }
 
-    // Inicia o carrinho na primeira vez que a página carrega
+    // Adiciona os event listeners aos inputs de rádio para entrega
+    document.querySelectorAll('input[name="entrega"]').forEach(radio => {
+        radio.addEventListener('change', atualizarCarrinho);
+    });
+
     document.addEventListener('DOMContentLoaded', atualizarCarrinho);
   </script>
 </body>
