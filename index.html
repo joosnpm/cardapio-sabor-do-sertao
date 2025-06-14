@@ -11,6 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
+  <!-- Script do EmailJS - Adicionado para envio de e-mail -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
   <style>
     /* Estilos personalizados para complementar o Tailwind */
     body {
@@ -126,8 +129,12 @@
               <input type="text" id="nome" class="w-full p-2 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="Digite seu nome">
             </div>
             <div>
-              <label for="turma" class="block text-sm font-medium text-amber-800 mb-1">Sua Turma (Opcional)</label>
-              <input type="text" id="turma" class="w-full p-2 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="Ex: ADM-01">
+              <label for="telefone" class="block text-sm font-medium text-amber-800 mb-1">Seu WhatsApp *</label>
+              <input type="tel" id="telefone" class="w-full p-2 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="(XX) XXXXX-XXXX">
+            </div>
+            <div class="sm:col-span-2">
+               <label for="turma" class="block text-sm font-medium text-amber-800 mb-1">Sua Turma (Opcional)</label>
+               <input type="text" id="turma" class="w-full p-2 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="Ex: ADM-01">
             </div>
           </div>
         </div>
@@ -167,22 +174,34 @@
       
       <textarea id="obs" class="w-full mt-4 p-3 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="Observações do pedido (opcional)"></textarea>
       
-      <!-- Mensagem de Confirmação da Data/Hora -->
       <div class="mt-6 p-4 bg-amber-100 border-l-4 border-amber-500 text-amber-800 rounded-r-lg">
         <p class="font-bold">Atenção!</p>
         <p class="text-sm">As retiradas e entregas ocorrerão no dia **17/06**, das **19h às 22h**, durante a Maratona Gastronômica.</p>
       </div>
       
       <button id="finalizar" onclick="finalizarPedido()" class="w-full mt-6 bg-green-600 text-white font-bold py-3 px-6 text-lg rounded-lg hover:bg-green-700 transition-all shadow-lg transform hover:scale-105">
-        Finalizar Pedido no WhatsApp
+        Finalizar Pedido
       </button>
     </div>
 
   </main>
 
   <script>
+    // --- Configuração do EmailJS ---
+    // 1. Crie uma conta gratuita em https://www.emailjs.com
+    // 2. Conecte seu e-mail (ex: Gmail) em "Email Services".
+    // 3. Crie um "Email Template". Você pode usar as variáveis abaixo (ex: {{nome_cliente}}, {{pedido_detalhes}}) no seu template.
+    // 4. Copie suas chaves aqui:
+    (function(){
+       emailjs.init("efsCX7TbGybNV6nI5"); // Cole sua Public Key aqui
+    })();
+    const SERVICE_ID = "service_wpsjb4q"; // Cole seu Service ID aqui
+    const TEMPLATE_ID = "template_81xt8vf"; // Cole seu Template ID aqui
+    // --- Fim da Configuração ---
+
+
     const carrinho = [];
-    const numeroWhatsApp = "5587996612962"; // Coloque aqui o número de WhatsApp que receberá os pedidos
+    const numeroWhatsApp = "5587996612962"; 
 
     function adicionarItem(nome, preco, inputId) {
       const quantidadeInput = document.getElementById(inputId);
@@ -257,12 +276,15 @@
     }
 
     function finalizarPedido() {
+      const finalizarBtn = document.getElementById('finalizar');
+      
       if (carrinho.length === 0) {
         alert("Seu carrinho está vazio! Adicione um item para continuar.");
         return;
       }
       
       const nome = document.getElementById("nome").value.trim();
+      const telefone = document.getElementById("telefone").value.trim();
       const turma = document.getElementById("turma").value.trim();
       const addLeiteCondensado = document.getElementById("add-leite-condensado").checked;
       const addCoco = document.getElementById("add-coco").checked;
@@ -270,26 +292,31 @@
       const formaPagamento = document.getElementById("pagamento").value;
       const obs = document.getElementById("obs").value.trim();
 
-      if (!nome) {
-        alert("Por favor, preencha seu nome para continuar.");
-        document.getElementById("nome").focus();
+      if (!nome || !telefone) {
+        alert("Por favor, preencha seu Nome e WhatsApp para continuar.");
         return;
       }
       if (!formaPagamento) {
         alert("Por favor, selecione uma forma de pagamento.");
-        document.getElementById("pagamento").focus();
         return;
       }
 
-      let mensagem = `Olá, *Sabor do Sertão*!\nGostaria de fazer o seguinte pedido:\n\n`;
-      
+      finalizarBtn.disabled = true;
+      finalizarBtn.innerText = "Enviando...";
+
+      // --- Preparação dos dados para WhatsApp e E-mail ---
+      let pedido_whatsapp = "";
+      let pedido_email = "";
       carrinho.forEach(item => {
-        mensagem += `• _${item.qtd}x_ *${item.nome}* - R$ ${(item.preco * item.qtd).toFixed(2)}\n`;
+        const linhaPedido = `• ${item.qtd}x ${item.nome} - R$ ${(item.preco * item.qtd).toFixed(2)}\n`;
+        pedido_whatsapp += `• _${item.qtd}x_ *${item.nome}* - R$ ${(item.preco * item.qtd).toFixed(2)}\n`;
+        pedido_email += linhaPedido;
       });
 
       let subtotal = carrinho.reduce((soma, item) => soma + item.preco * item.qtd, 0);
       let taxaEntrega = 0;
       let totalFinal = subtotal;
+      let textoTaxa = "";
 
       if (formaEntrega === "Entregar na UAST") {
           const qtdFatias = carrinho.find(item => item.nome === 'Fatia do Bolo')?.qtd || 0;
@@ -298,45 +325,74 @@
               taxaEntrega = 1.00;
               totalFinal += taxaEntrega;
           }
-      }
-      
-      mensagem += `\n*Subtotal:* R$ ${subtotal.toFixed(2)}`;
-      if (formaEntrega === "Entregar na UAST") {
-        mensagem += `\n*Taxa de Entrega:* ${taxaEntrega > 0 ? `R$ ${taxaEntrega.toFixed(2)}` : 'Grátis!'}`;
-      }
-      mensagem += `\n\n*Total do Pedido:* R$ ${totalFinal.toFixed(2)}`;
-
-      mensagem += `\n\n--- _Detalhes do Pedido_ ---\n`;
-      mensagem += `*Cliente:* ${nome}\n`;
-      if (turma) {
-        mensagem += `*Turma:* ${turma}\n`;
+          textoTaxa = taxaEntrega > 0 ? `R$ ${taxaEntrega.toFixed(2)}` : 'Grátis!';
       }
       
       let preparo = [];
       if (addLeiteCondensado) preparo.push("Leite Condensado");
       if (addCoco) preparo.push("Coco Ralado Extra");
-      if (preparo.length > 0) {
-        mensagem += `*Como Preparar:* ${preparo.join(', ')}\n`;
-      } else {
-        mensagem += `*Como Preparar:* _Padrão_\n`;
-      }
-
-      mensagem += `*Entrega:* ${formaEntrega}\n`;
-      mensagem += `*Pagamento:* ${formaPagamento}`;
-
-      if (obs) {
-        mensagem += `\n\n_Observações:_\n${obs}`;
-      }
       
-      mensagem += `\n\n--- _Retirada/Entrega_ ---\n`;
-      mensagem += `*Data:* 17/06\n`;
-      mensagem += `*Horário:* Das 19h às 22h`;
+      // --- Objeto de parâmetros para o EmailJS ---
+      const templateParams = {
+          nome_cliente: nome,
+          telefone_cliente: telefone,
+          turma_cliente: turma || "Não informado",
+          pedido_detalhes: pedido_email,
+          subtotal: `R$ ${subtotal.toFixed(2)}`,
+          taxa_entrega: textoTaxa || "N/A",
+          total_pedido: `R$ ${totalFinal.toFixed(2)}`,
+          como_preparar: preparo.length > 0 ? preparo.join(', ') : "Padrão",
+          entrega: formaEntrega,
+          pagamento: formaPagamento,
+          observacoes: obs || "Sem observações"
+      };
 
-      const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
-      window.open(url, "_blank");
+      // --- Envio do E-mail via EmailJS ---
+      emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+        .then(function(response) {
+           console.log('E-MAIL ENVIADO COM SUCESSO!', response.status, response.text);
+           abrirWhatsApp(); // Abre o WhatsApp somente após o sucesso do e-mail
+        }, function(error) {
+           console.log('FALHA NO ENVIO DO E-MAIL...', error);
+           alert("Houve uma falha ao enviar a notificação do seu pedido. Por favor, tente novamente.");
+           abrirWhatsApp(); // Abre o WhatsApp mesmo se o e-mail falhar, para não perder o pedido.
+        });
+
+      function abrirWhatsApp() {
+        let mensagem_whatsapp = `Olá, *Sabor do Sertão*!\nGostaria de fazer o seguinte pedido:\n\n${pedido_whatsapp}`;
+        mensagem_whatsapp += `\n*Subtotal:* R$ ${subtotal.toFixed(2)}`;
+        if (formaEntrega === "Entregar na UAST") {
+          mensagem_whatsapp += `\n*Taxa de Entrega:* ${textoTaxa}`;
+        }
+        mensagem_whatsapp += `\n\n*Total do Pedido:* R$ ${totalFinal.toFixed(2)}`;
+        mensagem_whatsapp += `\n\n--- _Detalhes do Pedido_ ---\n`;
+        mensagem_whatsapp += `*Cliente:* ${nome}\n`;
+        mensagem_whatsapp += `*Contato:* ${telefone}\n`;
+        if (turma) {
+          mensagem_whatsapp += `*Turma:* ${turma}\n`;
+        }
+        if (preparo.length > 0) {
+          mensagem_whatsapp += `*Como Preparar:* ${preparo.join(', ')}\n`;
+        } else {
+          mensagem_whatsapp += `*Como Preparar:* _Padrão_\n`;
+        }
+        mensagem_whatsapp += `*Entrega:* ${formaEntrega}\n`;
+        mensagem_whatsapp += `*Pagamento:* ${formaPagamento}`;
+        if (obs) {
+          mensagem_whatsapp += `\n\n_Observações:_\n${obs}`;
+        }
+        mensagem_whatsapp += `\n\n--- _Retirada/Entrega_ ---\n`;
+        mensagem_whatsapp += `*Data:* 17/06\n`;
+        mensagem_whatsapp += `*Horário:* Das 19h às 22h`;
+        
+        const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem_whatsapp)}`;
+        window.open(url, "_blank");
+
+        finalizarBtn.disabled = false;
+        finalizarBtn.innerText = "Finalizar Pedido";
+      }
     }
 
-    // Adiciona os event listeners aos inputs de rádio para entrega
     document.querySelectorAll('input[name="entrega"]').forEach(radio => {
         radio.addEventListener('change', atualizarCarrinho);
     });
