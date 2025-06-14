@@ -147,8 +147,8 @@
           <div>
             <h3 class="text-xl font-bold text-amber-900 mb-2">Opções de Entrega</h3>
             <div class="space-y-2">
-              <label class="flex items-center"><input type="radio" name="entrega" value="Retirar no Local (área de convivência )" checked onchange="atualizarCarrinho()" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500"> <span class="ml-2">Retirar no Local</span></label>
-              <label class="flex items-center"><input type="radio" name="entrega" value="Entregar na UAST (das 19h às 22h)" onchange="atualizarCarrinho()" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500"> <span class="ml-2">Entregar na UAST (das 19h às 22h) (Taxa: R$ 1,00)</span></label>
+              <label class="flex items-center"><input type="radio" name="entrega" value="Retirar no Local (área de convivência das 19h às 22h)" checked onchange="atualizarCarrinho()" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500"> <span class="ml-2">Retirar no Local (área de convivência das 19h às 22h)</span></label>
+              <label class="flex items-center"><input type="radio" name="entrega" value="UAST (das 19h às 22h)" onchange="atualizarCarrinho()" class="h-4 w-4 text-amber-600 border-gray-300 focus:ring-amber-500"> <span class="ml-2">Entregar na UAST (das 19h às 22h) (Taxa: R$ 1,00)</span></label>
               <p class="text-xs text-amber-700 ml-6">Grátis a partir de 2 fatias!</p>
             </div>
           </div>
@@ -244,7 +244,7 @@
       let totalFinal = subtotal;
       let htmlTotal = `<div>Subtotal: R$ ${subtotal.toFixed(2)}</div>`;
       
-      if (formaEntrega === "Entregar na UAST (das 19h às 22h)") {
+      if (formaEntrega === "UAST (das 19h às 22h)") {
           const qtdFatias = carrinho.find(item => item.nome === 'Fatia do Bolo')?.qtd || 0;
           if (qtdFatias < 2) {
               taxaEntrega = 1.00;
@@ -295,7 +295,7 @@
       let taxaEntrega = 0;
       let totalFinal = subtotal;
 
-      if (formaEntrega === "Entregar na UAST (das 19h às 22h)") {
+      if (formaEntrega === "UAST (das 19h às 22h)") {
           const qtdFatias = carrinho.find(item => item.nome === 'Fatia do Bolo')?.qtd || 0;
           if (qtdFatias < 2) {
               taxaEntrega = 1.00;
@@ -304,7 +304,7 @@
       }
       
       mensagem += `\n*Subtotal:* R$ ${subtotal.toFixed(2)}`;
-      if (formaEntrega === "Entregar na UAST (das 19h às 22h)") {
+      if (formaEntrega === "UAST (das 19h às 22h)") {
         mensagem += `\n*Taxa de Entrega:* ${taxaEntrega > 0 ? `R$ ${taxaEntrega.toFixed(2)}` : 'Grátis!'}`;
       }
       mensagem += `\n\n*Total do Pedido:* R$ ${totalFinal.toFixed(2)}`;
